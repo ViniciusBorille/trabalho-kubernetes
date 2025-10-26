@@ -17,4 +17,4 @@ spec:
           image: trabalho-adrian:latest
           imagePullPolicy: Never 
           ports:
-          - containerPort: 3000
+          - containerPort: 3123

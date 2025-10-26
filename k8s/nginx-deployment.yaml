@@ -1,19 +1,20 @@
 apiVersion: apps/v1
 kind: Deployment
 metadata:
-  name: grafana
+  name: nginx-deployment
 spec:
   replicas: 1
   selector:
     matchLabels:
-      app: grafana
+      app: nginx
   template:
     metadata:
       labels:
-        app: grafana
+        app: nginx
     spec:
       containers:
-      - name: grafana
-        image: grafana/grafana:latest
+      - name: nginx
+        image: nginx-proxy:latest
+        imagePullPolicy: Never
         ports:
-        - containerPort: 3123
+        - containerPort: 80

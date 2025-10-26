@@ -6,6 +6,6 @@ spec:
   selector:
     app: trabalho-adrian  ports:
   - protocol: TCP
-    port: 3000
-    targetPort: 3000
+    port: 3123
+    targetPort: 3123
   type: NodePort
