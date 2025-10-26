@@ -1,0 +1,11 @@
+minikube start --driver=docker
+kubectl get pods
+& minikube -p minikube docker-env | invoke-expression
+docker build -t trabalho_adrian .
+docker images
+kubectl apply -f .\k8s\
+kubectl get pods
+
+minikube service prometheus
+minikube service grafana
+minikube service trabalho_adrian
