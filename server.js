@@ -2,8 +2,9 @@ const express = require('express');
 const client = require('prom-client');
 
 const app = express();
-const colectDefaultMetrics = client.collectDefaultMetrics;
-collectDefaultMetrics;
+// CORRIGIDO: A função é chamada para iniciar a coleta de métricas padrão.
+const collectDefaultMetrics = client.collectDefaultMetrics;
+collectDefaultMetrics(); // A função precisa ser executada com ()
 
 const counter = new client.Counter({
   name: 'app_request_total',

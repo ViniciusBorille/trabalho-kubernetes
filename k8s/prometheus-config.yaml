@@ -9,4 +9,4 @@ data:
     scrape_configs:
       - job_name: 'trabalho-adrian'
         static_configs:
-          - targets: ['trabalho_adrian_service:3123']
+          - targets: ['trabalho-adrian-service:3123']

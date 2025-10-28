@@ -4,7 +4,8 @@ metadata:
   name: trabalho-adrian-service
 spec:
   selector:
-    app: trabalho-adrian  ports:
+    app: trabalho-adrian  
+  ports:
   - protocol: TCP
     port: 3123
     targetPort: 3123
