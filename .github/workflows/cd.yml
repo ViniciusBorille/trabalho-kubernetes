@@ -21,6 +21,7 @@ jobs:
 
       - name: Set vars
         id: vars
+        shell: bash
         run: |
           echo "IMAGE=vborille/trabalho-adrian" >> $GITHUB_OUTPUT
           echo "TAG_SHA=${GITHUB_SHA::7}" >> $GITHUB_OUTPUT
@@ -32,17 +33,20 @@ jobs:
           version: 'latest'
 
       - name: Configure kubeconfig
+        shell: bash
         run: |
           mkdir -p $HOME/.kube
           echo "${{ secrets.KUBE_CONFIG_DATA }}" | base64 -d > $HOME/.kube/config
 
       - name: Create namespace if not exists
+        shell: bash
         run: |
           kubectl get ns ${{ steps.vars.outputs.NAMESPACE }} || \
           kubectl create ns ${{ steps.vars.outputs.NAMESPACE }}
 
       # Aplica/garante os serviços/ingress/etc. estáticos (opcional na primeira vez)
       - name: Apply base manifests (Service, Prometheus, Grafana, Nginx)
+        shell: bash
         run: |
           kubectl apply -n ${{ steps.vars.outputs.NAMESPACE }} -f k8s/service.yaml || true
           kubectl apply -n ${{ steps.vars.outputs.NAMESPACE }} -f k8s/prometheus-deployment.yaml || true
@@ -53,19 +57,24 @@ jobs:
 
       # Aplica/garante o Deployment (se ainda não existir)
       - name: Apply app deployment (first time)
+        shell: bash
+        shell: bash
         run: |
           kubectl apply -n ${{ steps.vars.outputs.NAMESPACE }} -f k8s/deployment.yaml
 
       # Atualiza a imagem para a tag nova (idempotente)
       - name: Set image to new tag
+        shell: bash  
         run: |
           kubectl set image deployment/trabalho-adrian trabalho-adrian=${{ steps.vars.outputs.IMAGE }}:${{ steps.vars.outputs.TAG_SHA }} -n ${{ steps.vars.outputs.NAMESPACE }}
 
       - name: Wait rollout
+        shell: bash  
         run: |
           kubectl rollout status deployment/trabalho-adrian -n ${{ steps.vars.outputs.NAMESPACE }} --timeout=120s
 
       - name: Show services (debug)
+        shell: bash  
         run: |
           kubectl get svc -n ${{ steps.vars.outputs.NAMESPACE }}
           kubectl get pods -o wide -n ${{ steps.vars.outputs.NAMESPACE }}
