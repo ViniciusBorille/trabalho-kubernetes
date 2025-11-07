@@ -33,7 +33,7 @@ jobs:
           version: 'latest'
 
       - name: Configure kubeconfig
-        shell: bash
+        shell: bash  
         run: |
           mkdir -p $HOME/.kube
           echo "${{ secrets.KUBE_CONFIG_DATA }}" | base64 -d > $HOME/.kube/config
@@ -57,23 +57,19 @@ jobs:
 
       # Aplica/garante o Deployment (se ainda não existir)
       - name: Apply app deployment (first time)
-        shell: bash
         run: |
           kubectl apply -n ${{ steps.vars.outputs.NAMESPACE }} -f k8s/deployment.yaml
 
       # Atualiza a imagem para a tag nova (idempotente)
       - name: Set image to new tag
-        shell: bash  
         run: |
           kubectl set image deployment/trabalho-adrian trabalho-adrian=${{ steps.vars.outputs.IMAGE }}:${{ steps.vars.outputs.TAG_SHA }} -n ${{ steps.vars.outputs.NAMESPACE }}
 
       - name: Wait rollout
-        shell: bash  
         run: |
           kubectl rollout status deployment/trabalho-adrian -n ${{ steps.vars.outputs.NAMESPACE }} --timeout=120s
 
       - name: Show services (debug)
-        shell: bash  
         run: |
           kubectl get svc -n ${{ steps.vars.outputs.NAMESPACE }}
           kubectl get pods -o wide -n ${{ steps.vars.outputs.NAMESPACE }}
