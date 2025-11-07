@@ -14,7 +14,7 @@ spec:
     spec:
       containers:
         - name: trabalho-adrian
-          image: trabalho-adrian:latest
-          imagePullPolicy: Never 
+          image: vborille/trabalho-kubernetes:latest
+          imagePullPolicy: IfNotPresent
           ports:
           - containerPort: 3123

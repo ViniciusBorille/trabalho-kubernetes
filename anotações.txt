@@ -1,11 +1,15 @@
+comandos para inciar
+
 minikube start --driver=docker
 kubectl get pods
 & minikube -p minikube docker-env | invoke-expression
-docker build -t trabalho_adrian .
+docker build -t trabalho-adrian .
 docker images
 kubectl apply -f .\k8s\
 kubectl get pods
 
 minikube service prometheus
 minikube service grafana
-minikube service trabalho_adrian
+minikube service trabalho-adrianmin
+
+minikube start
