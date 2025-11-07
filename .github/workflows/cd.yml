@@ -58,7 +58,6 @@ jobs:
       # Aplica/garante o Deployment (se ainda não existir)
       - name: Apply app deployment (first time)
         shell: bash
-        shell: bash
         run: |
           kubectl apply -n ${{ steps.vars.outputs.NAMESPACE }} -f k8s/deployment.yaml
 
