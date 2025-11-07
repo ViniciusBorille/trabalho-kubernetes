@@ -13,3 +13,4 @@ minikube service grafana
 minikube service trabalho-adrianmin
 
 minikube start
+##
