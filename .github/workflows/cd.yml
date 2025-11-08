@@ -41,9 +41,8 @@ jobs:
       - name: Create namespace if not exists
         shell: powershell
         run: |
-          try {
-            kubectl get ns ${{ steps.vars.outputs.NAMESPACE }} -ErrorAction Stop
-          } catch {
+          kubectl get ns ${{ steps.vars.outputs.NAMESPACE }}
+          if (-not $?) {
             Write-Host "Namespace nao encontrado, a criar..."
             kubectl create ns ${{ steps.vars.outputs.NAMESPACE }}
           }
@@ -52,12 +51,12 @@ jobs:
       - name: Apply base manifests (Service, Prometheus, Grafana, Nginx)
         shell: powershell
         run: |
-          kubectl apply -n ${{ steps.vars.outputs.NAMESPACE }} -f k8s/service.yaml -ErrorAction SilentlyContinue
-          kubectl apply -n ${{ steps.vars.outputs.NAMESPACE }} -f k8s/prometheus-deployment.yaml -ErrorAction SilentlyContinue
-          kubectl apply -n ${{ steps.vars.outputs.NAMESPACE }} -f k8s/grafana-deployment.yaml -ErrorAction SilentlyContinue
-          kubectl apply -n ${{ steps.vars.outputs.NAMESPACE }} -f k8s/nginx-deployment.yaml -ErrorAction SilentlyContinue
-          kubectl apply -n ${{ steps.vars.outputs.NAMESPACE }} -f k8s/nginx-service.yaml -ErrorAction SilentlyContinue
-          kubectl apply -n ${{ steps.vars.outputs.NAMESPACE }} -f k8s/prometheus-config.yaml -ErrorAction SilentlyContinue
+          try { kubectl apply -n ${{ steps.vars.outputs.NAMESPACE }} -f k8s/service.yaml } catch { Write-Host "Ignorando falha no apply..." }
+          try { kubectl apply -n ${{ steps.vars.outputs.NAMESPACE }} -f k8s/prometheus-deployment.yaml } catch { Write-Host "Ignorando falha no apply..." }
+          try { kubectl apply -n ${{ steps.vars.outputs.NAMESPACE }} -f k8s/grafana-deployment.yaml } catch { Write-Host "Ignorando falha no apply..." }
+          try { kubectl apply -n ${{ steps.vars.outputs.NAMESPACE }} -f k8s/nginx-deployment.yaml } catch { Write-Host "Ignorando falha no apply..." }
+          try { kubectl apply -n ${{ steps.vars.outputs.NAMESPACE }} -f k8s/nginx-service.yaml } catch { Write-Host "Ignorando falha no apply..." }
+          try { kubectl apply -n ${{ steps.vars.outputs.NAMESPACE }} -f k8s/prometheus-config.yaml } catch { Write-Host "Ignorando falha no apply..." }
 
       # Aplica/garante o Deployment (se ainda não existir)
       - name: Apply app deployment (first time)
