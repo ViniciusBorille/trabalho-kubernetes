@@ -23,8 +23,9 @@ jobs:
         id: vars
         shell: powershell
         run: |
-          "IMAGE=vborille/trabalho-adrian" | Add-Content -Path $env:GITHUB_OUTPUT
-          "TAG_SHA=$($env:GITHUB_SHA.Substring(0, 7))" | Add-Content -Path $env:GITHUB_OUTPUT          "NAMESPACE=${{ secrets.K8S_NAMESPACE || 'default' }}" | Add-Content -Path $env:GITHUB_OUTPUT
+          Add-Content -Path $env:GITHUB_OUTPUT -Value "IMAGE=vborille/trabalho-adrian"
+          Add-Content -Path $env:GITHUB_OUTPUT -Value "TAG_SHA=$($env:GITHUB_SHA.Substring(0, 7))"
+          Add-Content -Path $env:GITHUB_OUTPUT -Value "NAMESPACE=${{ secrets.K8S_NAMESPACE || 'default' }}"
 
       - name: Setup kubectl
         uses: azure/setup-kubectl@v4
