@@ -14,7 +14,7 @@ spec:
     spec:
       containers:
       - name: nginx
-        image: nginx-proxy:latest
-        imagePullPolicy: Never
+        image: vborille/trabalho-adrian-nginx:latest
+        imagePullPolicy: IfNotPresent
         ports:
         - containerPort: 80

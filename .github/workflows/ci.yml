@@ -57,7 +57,7 @@ jobs:
           username: ${{ secrets.DOCKERHUB_USERNAME }}
           password: ${{ secrets.DOCKERHUB_TOKEN }}
 
-      - name: Build & Push
+      - name: Build & Push (app)
         uses: docker/build-push-action@v6
         with:
           context: .
@@ -68,3 +68,13 @@ jobs:
             ${{ steps.vars.outputs.IMAGE }}:${{ steps.vars.outputs.TAG_SHA }}
           cache-from: type=registry,ref=${{ steps.vars.outputs.IMAGE }}:buildcache
           cache-to: type=registry,ref=${{ steps.vars.outputs.IMAGE }}:buildcache,mode=max
+
+      - name: Build & Push (Nginx)
+        uses: docker/build-push-action@v6
+        with:
+          context: ./nginx # Diz ao Docker para usar a pasta 'nginx'
+          file: ./nginx/dockerfile # Aponta para o dockerfile do nginx
+          push: true
+          tags: |
+            vborille/trabalho-adrian-nginx:latest
+            vborille/trabalho-adrian-nginx:${{ steps.vars.outputs.TAG_SHA }}
