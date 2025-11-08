@@ -21,11 +21,11 @@ jobs:
 
       - name: Set vars
         id: vars
-        shell: bash
+        shell: pwsh
         run: |
-          echo "IMAGE=vborille/trabalho-adrian" >> $GITHUB_OUTPUT
-          echo "TAG_SHA=${GITHUB_SHA::7}" >> $GITHUB_OUTPUT
-          echo "NAMESPACE=${{ secrets.K8S_NAMESPACE || 'default' }}" >> $GITHUB_OUTPUT
+          "IMAGE=vborille/trabalho-adrian" | Add-Content -Path $env:GITHUB_OUTPUT
+          "TAG_SHA=${{ github.sha.Substring(0, 7) }}" | Add-Content -Path $env:GITHUB_OUTPUT
+          "NAMESPACE=${{ secrets.K8S_NAMESPACE || 'default' }}" | Add-Content -Path $env:GITHUB_OUTPUT
 
       - name: Setup kubectl
         uses: azure/setup-kubectl@v4
@@ -33,27 +33,31 @@ jobs:
           version: 'latest'
 
       - name: Configure kubeconfig
-        shell: bash  
+        shell: pwsh 
         run: |
-          mkdir -p $HOME/.kube
-          echo "${{ secrets.KUBE_CONFIG_DATA }}" | base64 -d > $HOME/.kube/config
+          New-Item -ItemType Directory -Force -Path "$env:USERPROFILE\.kube"
+          [System.Text.Encoding]::UTF8.GetString([System.Convert]::FromBase64String("${{ secrets.KUBE_CONFIG_DATA }}")) | Set-Content -Path "$env:USERPROFILE\.kube\config"
 
       - name: Create namespace if not exists
-        shell: bash
+        shell: pwsh
         run: |
-          kubectl get ns ${{ steps.vars.outputs.NAMESPACE }} || \
-          kubectl create ns ${{ steps.vars.outputs.NAMESPACE }}
+          try {
+            kubectl get ns ${{ steps.vars.outputs.NAMESPACE }} -ErrorAction Stop
+          } catch {
+            Write-Host "Namespace nao encontrado, a criar..."
+            kubectl create ns ${{ steps.vars.outputs.NAMESPACE }}
+          }
 
       # Aplica/garante os serviços/ingress/etc. estáticos (opcional na primeira vez)
       - name: Apply base manifests (Service, Prometheus, Grafana, Nginx)
-        shell: bash
+        shell: pwsh
         run: |
-          kubectl apply -n ${{ steps.vars.outputs.NAMESPACE }} -f k8s/service.yaml || true
-          kubectl apply -n ${{ steps.vars.outputs.NAMESPACE }} -f k8s/prometheus-deployment.yaml || true
-          kubectl apply -n ${{ steps.vars.outputs.NAMESPACE }} -f k8s/grafana-deployment.yaml || true
-          kubectl apply -n ${{ steps.vars.outputs.NAMESPACE }} -f k8s/nginx-deployment.yaml || true
-          kubectl apply -n ${{ steps.vars.outputs.NAMESPACE }} -f k8s/nginx-service.yaml || true
-          kubectl apply -n ${{ steps.vars.outputs.NAMESPACE }} -f k8s/prometheus-config.yaml || true
+          kubectl apply -n ${{ steps.vars.outputs.NAMESPACE }} -f k8s/service.yaml -ErrorAction SilentlyContinue
+          kubectl apply -n ${{ steps.vars.outputs.NAMESPACE }} -f k8s/prometheus-deployment.yaml -ErrorAction SilentlyContinue
+          kubectl apply -n ${{ steps.vars.outputs.NAMESPACE }} -f k8s/grafana-deployment.yaml -ErrorAction SilentlyContinue
+          kubectl apply -n ${{ steps.vars.outputs.NAMESPACE }} -f k8s/nginx-deployment.yaml -ErrorAction SilentlyContinue
+          kubectl apply -n ${{ steps.vars.outputs.NAMESPACE }} -f k8s/nginx-service.yaml -ErrorAction SilentlyContinue
+          kubectl apply -n ${{ steps.vars.outputs.NAMESPACE }} -f k8s/prometheus-config.yaml -ErrorAction SilentlyContinue
 
       # Aplica/garante o Deployment (se ainda não existir)
       - name: Apply app deployment (first time)
