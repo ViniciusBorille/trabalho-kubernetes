@@ -21,7 +21,7 @@ jobs:
 
       - name: Set vars
         id: vars
-        shell: pwsh
+        shell: powershell
         run: |
           "IMAGE=vborille/trabalho-adrian" | Add-Content -Path $env:GITHUB_OUTPUT
           "TAG_SHA=$($env:GITHUB_SHA.Substring(0, 7))" | Add-Content -Path $env:GITHUB_OUTPUT          "NAMESPACE=${{ secrets.K8S_NAMESPACE || 'default' }}" | Add-Content -Path $env:GITHUB_OUTPUT
@@ -32,13 +32,13 @@ jobs:
           version: 'latest'
 
       - name: Configure kubeconfig
-        shell: pwsh 
+        shell: powershell 
         run: |
           New-Item -ItemType Directory -Force -Path "$env:USERPROFILE\.kube"
           [System.Text.Encoding]::UTF8.GetString([System.Convert]::FromBase64String("${{ secrets.KUBE_CONFIG_DATA }}")) | Set-Content -Path "$env:USERPROFILE\.kube\config"
 
       - name: Create namespace if not exists
-        shell: pwsh
+        shell: powershell
         run: |
           try {
             kubectl get ns ${{ steps.vars.outputs.NAMESPACE }} -ErrorAction Stop
@@ -49,7 +49,7 @@ jobs:
 
       # Aplica/garante os serviços/ingress/etc. estáticos (opcional na primeira vez)
       - name: Apply base manifests (Service, Prometheus, Grafana, Nginx)
-        shell: pwsh
+        shell: powershell
         run: |
           kubectl apply -n ${{ steps.vars.outputs.NAMESPACE }} -f k8s/service.yaml -ErrorAction SilentlyContinue
           kubectl apply -n ${{ steps.vars.outputs.NAMESPACE }} -f k8s/prometheus-deployment.yaml -ErrorAction SilentlyContinue
